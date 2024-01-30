@@ -3,10 +3,10 @@ package consumer
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/apache/rocketmq-client-go/v2"
 	"github.com/apache/rocketmq-client-go/v2/consumer"
 	"github.com/apache/rocketmq-client-go/v2/primitive"
+	"github.com/xxl6097/go-glog/glog"
 )
 
 //type OnReceiver interface {
@@ -33,7 +33,7 @@ func (this *Consumer) NewConsumer(server, groupName string) error {
 		consumer.WithGroupName(groupName),
 	)
 	if err != nil {
-		fmt.Println("NewPushConsumer失败：", err)
+		glog.Error("NewPushConsumer失败：", err)
 		return err
 	}
 	this.consumer = &c
@@ -45,7 +45,7 @@ func (this *Consumer) Shutdown() error {
 		//关闭连接
 		err := (*this.consumer).Shutdown()
 		if err != nil {
-			fmt.Printf("shutdown consumer error: %s", err.Error())
+			glog.Errorf("shutdown consumer error: %s\n", err.Error())
 			return err
 		}
 	} else {
@@ -67,10 +67,11 @@ func (this *Consumer) Subscribe(topic string, _receiver OnReceiver) error {
 		}
 		return consumer.ConsumeSuccess, nil
 	}); err != nil {
-		fmt.Println("Subscribe failed->", err.Error())
+		glog.Error("Subscribe failed->", err.Error())
 		return err
 	}
-	fmt.Printf("Subscribe %v sucess\n", topic)
+	//fmt.Printf("Subscribe %v sucess\n", topic)
+	glog.Infof("Subscribe %v sucess\n", topic)
 	return nil
 }
 
@@ -78,7 +79,7 @@ func (this *Consumer) Start() error {
 	//启动
 	err := (*this.consumer).Start()
 	if err != nil {
-		fmt.Println(err.Error())
+		glog.Error(err.Error())
 		//os.Exit(-1)
 		return err
 	}

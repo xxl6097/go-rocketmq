@@ -3,10 +3,10 @@ package producer
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/apache/rocketmq-client-go/v2"
 	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/apache/rocketmq-client-go/v2/producer"
+	"github.com/xxl6097/go-glog/glog"
 )
 
 type Producer struct {
@@ -24,7 +24,7 @@ func (this *Producer) NewProducer(server string) error {
 	//连接RocketMQ
 	p, err := rocketmq.NewProducer(producer.WithNameServer([]string{server}))
 	if err != nil {
-		fmt.Println("NewProducer失败：", err)
+		glog.Error("NewProducer失败：", err)
 		return err
 	}
 	this.producer = &p
@@ -38,7 +38,7 @@ func (this *Producer) Start() error {
 	//启动
 	err := (*this.producer).Start()
 	if err != nil {
-		fmt.Println("启动producer错误：", err)
+		glog.Error("启动producer错误：", err)
 		return err
 	}
 	return nil
@@ -57,7 +57,7 @@ func (this *Producer) SendAsync(topic, json string, mq func(ctx context.Context,
 	//同步发送
 	err := (*this.producer).SendAsync(context.Background(), mq, msg)
 	if err != nil {
-		fmt.Printf("send message error: %s\n", err)
+		glog.Errorf("SendAsync message error: %s\n", err)
 		return err
 	}
 	return nil
@@ -76,10 +76,11 @@ func (this *Producer) SendSync(topic, json string) (*primitive.SendResult, error
 	//同步发送
 	res, err := (*this.producer).SendSync(context.Background(), msg)
 	if err != nil {
-		fmt.Printf("send message error: %s\n", err)
+		glog.Errorf("SendSync message error: %s\n", err)
 		return nil, err
 	} else {
-		fmt.Printf("send message success: result=%s\n", res.String())
+		//fmt.Printf("send message success: result=%s\n", res.String())
+		glog.Infof("send message success: result=%s\n", res.String())
 	}
 	return res, nil
 }
@@ -89,7 +90,8 @@ func (this *Producer) Shutdown() error {
 		//关闭连接
 		err := (*this.producer).Shutdown()
 		if err != nil {
-			fmt.Printf("shutdown producer error: %s", err.Error())
+			//fmt.Printf("shutdown producer error: %s", err.Error())
+			glog.Errorf("shutdown producer error: %s\n", err.Error())
 			return err
 		}
 	} else {

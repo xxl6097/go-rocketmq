@@ -1,5 +1,5 @@
 #!/bin/bash
-appName=gtbx-server
+appName=go-rocketMQ
 
 function menu() {
   CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o gtbx-server_amd64

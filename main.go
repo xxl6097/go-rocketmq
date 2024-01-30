@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"github.com/apache/rocketmq-client-go/v2/primitive"
+	"github.com/xxl6097/go-glog/glog"
 	"github.com/xxl6097/go-rocketmq/mq"
 	"time"
 )
@@ -17,7 +17,7 @@ func main() {
 	rokmq.InitRocketMQ(nameserver, groupname)
 	//Subscribe必须再Start之前
 	rokmq.Subscribe(topicSubs, func(msg *primitive.MessageExt) {
-		fmt.Println("-->recv:", string(msg.Body))
+		glog.Info("-->recv:", string(msg.Body))
 	})
 	rokmq.Start()
 	rokmq.SendSync(topicPush, "hello world "+time.Now().String())

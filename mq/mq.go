@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/apache/rocketmq-client-go/v2/primitive"
+	"github.com/xxl6097/go-glog/glog"
 	"github.com/xxl6097/go-rocketmq/mq/consumer"
 	"github.com/xxl6097/go-rocketmq/mq/producer"
 	"time"
@@ -27,20 +28,22 @@ func NewMQ() *RocketMQ {
 func (this *RocketMQ) InitRocketMQ(server, groupName string) {
 	err := this.consumer.NewConsumer(server, groupName)
 	if err != nil {
-		fmt.Println("NewConsumer failed ", err.Error())
+		//fmt.Println("NewConsumer failed ", err.Error())
+		glog.Error("NewConsumer failed ", err.Error())
 		for {
 			time.Sleep(time.Second * 5)
 			err = this.consumer.NewConsumer(server, groupName)
 			if err == nil {
 				break
 			} else {
-				fmt.Println("NewConsumer failed delay 5s retry ", err.Error())
+				//fmt.Println("NewConsumer failed delay 5s retry ", err.Error())
+				glog.Error("NewConsumer failed delay 5s retry ", err.Error())
 			}
 		}
 	}
 	err = this.producer.NewProducer(server)
 	if err != nil {
-		fmt.Println("NewProducer failed ", err.Error())
+		glog.Error("NewProducer failed ", err.Error())
 		for {
 			time.Sleep(time.Second * 5)
 			err = this.producer.NewProducer(server)
@@ -58,30 +61,30 @@ func (this *RocketMQ) Start() {
 	if err != nil {
 		for {
 			time.Sleep(time.Second * 5)
-			fmt.Println("producer start failed")
+			glog.Error("producer start failed")
 			err = this.consumer.Start()
 			if err == nil {
 				break
 			} else {
-				fmt.Println("producer start failed delay 5s retry ", err.Error())
+				glog.Error("producer start failed delay 5s retry ", err.Error())
 			}
 		}
 	}
-	fmt.Println("consumer start sucess")
+	glog.Info("consumer start sucess")
 	err = this.producer.Start()
 	if err != nil {
 		for {
 			time.Sleep(time.Second * 5)
-			fmt.Println("consumer start failed")
+			glog.Error("consumer start failed")
 			err = this.producer.Start()
 			if err == nil {
 				break
 			} else {
-				fmt.Println("consumer start failed delay 5s retry ", err.Error())
+				glog.Error("consumer start failed delay 5s retry ", err.Error())
 			}
 		}
 	}
-	fmt.Println("producer start sucess")
+	glog.Info("producer start sucess")
 }
 
 func (this *RocketMQ) Subscribe(topic string, _receiver consumer.OnReceiver) {
@@ -89,12 +92,12 @@ func (this *RocketMQ) Subscribe(topic string, _receiver consumer.OnReceiver) {
 	if err != nil {
 		for {
 			time.Sleep(time.Second * 5)
-			fmt.Println("Subscribe failed")
+			glog.Error("Subscribe failed")
 			err = this.producer.Start()
 			if err == nil {
 				break
 			} else {
-				fmt.Println("Subscribe failed delay 5s retry ", err.Error())
+				glog.Error("Subscribe failed delay 5s retry ", err.Error())
 			}
 		}
 	}
@@ -123,7 +126,7 @@ func (this *RocketMQ) Wait(ctx context.Context) {
 			select {
 			case <-ctx.Done():
 				this.Shutdown()
-				fmt.Println("任务结束了...")
+				glog.Info("任务结束了...")
 				return
 			}
 		}
