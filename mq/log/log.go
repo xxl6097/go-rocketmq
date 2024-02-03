@@ -84,7 +84,7 @@ func (l *defaultLogger) OutputPath(path string) (err error) {
 
 var LogDebug bool
 
-func init() {
+func InitMQLog() {
 	r := &defaultLogger{}
 	rlog.SetLogger(r)
 }

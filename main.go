@@ -4,7 +4,6 @@ import (
 	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/xxl6097/go-glog/glog"
 	"github.com/xxl6097/go-rocketmq/mq"
-	"github.com/xxl6097/go-rocketmq/mq/log"
 	_ "github.com/xxl6097/go-rocketmq/mq/log"
 	"os"
 	"time"
@@ -20,7 +19,7 @@ func main() {
 	//os.Setenv("mq.consoleAppender.enabled", "true")
 	//golang.ResetLogger()
 	// new simpleConsumer inst
-	log.LogDebug = true
+	//log.LogDebug = true
 	os.Setenv("ROCKETMQ_GO_LOG_LEVEL", "error")
 	rokmq := mq.NewMQ()
 	rokmq.InitRocketMQ(nameserver, groupname)
