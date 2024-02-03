@@ -87,6 +87,10 @@ func (this *RocketMQ) Start() {
 	glog.Info("producer start sucess")
 }
 
+func (this *RocketMQ) Init() {
+	glog.Info("RocketMQ init")
+}
+
 func (this *RocketMQ) Subscribe(topic string, _receiver consumer.OnReceiver) {
 	err := this.consumer.Subscribe(topic, _receiver)
 	if err != nil {
