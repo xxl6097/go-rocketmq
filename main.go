@@ -4,6 +4,9 @@ import (
 	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/xxl6097/go-glog/glog"
 	"github.com/xxl6097/go-rocketmq/mq"
+	"github.com/xxl6097/go-rocketmq/mq/log"
+	_ "github.com/xxl6097/go-rocketmq/mq/log"
+	"os"
 	"time"
 )
 
@@ -13,6 +16,12 @@ var topicSubs = "clink-any-to-tcp-topic"
 var topicPush = "clink-tcp-to-any-topic"
 
 func main() {
+	//export ROCKETMQ_GO_LOG_LEVEL=error
+	//os.Setenv("mq.consoleAppender.enabled", "true")
+	//golang.ResetLogger()
+	// new simpleConsumer inst
+	log.LogDebug = true
+	os.Setenv("ROCKETMQ_GO_LOG_LEVEL", "error")
 	rokmq := mq.NewMQ()
 	rokmq.InitRocketMQ(nameserver, groupname)
 	//Subscribe必须再Start之前
@@ -21,9 +30,14 @@ func main() {
 	})
 	rokmq.Start()
 	rokmq.SendSync(topicPush, "hello world "+time.Now().String())
-	time.Sleep(time.Second * 60)
+
+	select {}
 
 	//ctx, cancel := context.WithCancel(context.Background())
 	//defer cancel()
 	//time.Wait(ctx)
+}
+
+func test() {
+	// 创建RocketMQ消费者
 }
