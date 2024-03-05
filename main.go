@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var nameserver = "10.6.14.3:9876"
+var nameserver = []string{"10.6.14.3:9876"}
 var groupname = "clink-tcp-roketmq"
 var topicSubs = "clink-any-to-tcp-topic"
 var topicPush = "clink-tcp-to-any-topic"

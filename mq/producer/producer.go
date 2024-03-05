@@ -20,9 +20,9 @@ func New() *Producer {
 	return p
 }
 
-func (this *Producer) NewProducer(server string) error {
+func (this *Producer) NewProducer(servers []string) error {
 	//连接RocketMQ
-	p, err := rocketmq.NewProducer(producer.WithNameServer([]string{server}))
+	p, err := rocketmq.NewProducer(producer.WithNameServer(servers))
 	if err != nil {
 		glog.Error("NewProducer失败：", err)
 		return err

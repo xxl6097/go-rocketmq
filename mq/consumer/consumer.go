@@ -26,10 +26,10 @@ func New() *Consumer {
 	return c
 }
 
-func (this *Consumer) NewConsumer(server, groupName string) error {
+func (this *Consumer) NewConsumer(servers []string, groupName string) error {
 	//启动recketmq并设置负载均衡的Group
 	c, err := rocketmq.NewPushConsumer(
-		consumer.WithNameServer([]string{server}),
+		consumer.WithNameServer(servers),
 		consumer.WithGroupName(groupName),
 	)
 	if err != nil {

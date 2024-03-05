@@ -25,14 +25,14 @@ func NewMQ() *RocketMQ {
 	return c
 }
 
-func (this *RocketMQ) InitRocketMQ(server, groupName string) {
-	err := this.consumer.NewConsumer(server, groupName)
+func (this *RocketMQ) InitRocketMQ(servers []string, groupName string) {
+	err := this.consumer.NewConsumer(servers, groupName)
 	if err != nil {
 		//fmt.Println("NewConsumer failed ", err.Error())
 		glog.Error("NewConsumer failed ", err.Error())
 		for {
 			time.Sleep(time.Second * 5)
-			err = this.consumer.NewConsumer(server, groupName)
+			err = this.consumer.NewConsumer(servers, groupName)
 			if err == nil {
 				break
 			} else {
@@ -41,12 +41,12 @@ func (this *RocketMQ) InitRocketMQ(server, groupName string) {
 			}
 		}
 	}
-	err = this.producer.NewProducer(server)
+	err = this.producer.NewProducer(servers)
 	if err != nil {
 		glog.Error("NewProducer failed ", err.Error())
 		for {
 			time.Sleep(time.Second * 5)
-			err = this.producer.NewProducer(server)
+			err = this.producer.NewProducer(servers)
 			if err == nil {
 				break
 			} else {
