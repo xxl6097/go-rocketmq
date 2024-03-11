@@ -26,6 +26,10 @@ func New() *Consumer {
 	return c
 }
 
+func (this *Consumer) NewCustomConsumer(c *rocketmq.PushConsumer) {
+	this.consumer = c
+}
+
 func (this *Consumer) NewConsumer(servers []string, groupName string) error {
 	//启动recketmq并设置负载均衡的Group
 	c, err := rocketmq.NewPushConsumer(
@@ -36,6 +40,8 @@ func (this *Consumer) NewConsumer(servers []string, groupName string) error {
 		glog.Error("NewPushConsumer失败：", err)
 		return err
 	}
+	// 设置消息模式为广播模式
+	//c.SetModel(consumer.BroadCasting)
 	this.consumer = &c
 	return nil
 }

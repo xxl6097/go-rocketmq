@@ -20,6 +20,10 @@ func New() *Producer {
 	return p
 }
 
+func (this *Producer) NewCunstomProducer(p *rocketmq.Producer) {
+	this.producer = p
+}
+
 func (this *Producer) NewProducer(servers []string) error {
 	//连接RocketMQ
 	p, err := rocketmq.NewProducer(producer.WithNameServer(servers))
