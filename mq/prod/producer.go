@@ -1,4 +1,4 @@
-package producer
+package prod
 
 import (
 	"context"
@@ -20,8 +20,15 @@ func New() *Producer {
 	return p
 }
 
-func (this *Producer) NewCunstomProducer(p *rocketmq.Producer) {
-	this.producer = p
+func (this *Producer) NewCustomConsumer(opts ...producer.Option) error {
+	//连接RocketMQ
+	p, err := rocketmq.NewProducer(opts...)
+	if err != nil {
+		glog.Error("NewProducer失败：", err)
+		return err
+	}
+	this.producer = &p
+	return nil
 }
 
 func (this *Producer) NewProducer(servers []string) error {
@@ -37,7 +44,7 @@ func (this *Producer) NewProducer(servers []string) error {
 
 func (this *Producer) Start() error {
 	if this.producer == nil {
-		return errors.New("producer not new,please call function Connect()")
+		return errors.New("prod not new,please call function Connect()")
 	}
 	//启动
 	err := (*this.producer).Start()
@@ -51,7 +58,7 @@ func (this *Producer) Start() error {
 // SendAsync 异步方法
 func (this *Producer) SendAsync(topic, json string, mq func(ctx context.Context, result *primitive.SendResult, err error)) error {
 	if this.producer == nil {
-		return errors.New("producer not new,please call function Connect()")
+		return errors.New("prod not new,please call function Connect()")
 	}
 	//实例化消息
 	msg := &primitive.Message{
@@ -70,7 +77,7 @@ func (this *Producer) SendAsync(topic, json string, mq func(ctx context.Context,
 // SendSync 同步方法
 func (this *Producer) SendSync(topic, json string) (*primitive.SendResult, error) {
 	if this.producer == nil {
-		return nil, errors.New("producer not new,please call function Connect()")
+		return nil, errors.New("prod not new,please call function Connect()")
 	}
 	//实例化消息
 	msg := &primitive.Message{
@@ -94,12 +101,12 @@ func (this *Producer) Shutdown() error {
 		//关闭连接
 		err := (*this.producer).Shutdown()
 		if err != nil {
-			//fmt.Printf("shutdown producer error: %s", err.Error())
-			glog.Errorf("shutdown producer error: %s\n", err.Error())
+			//fmt.Printf("shutdown prod error: %s", err.Error())
+			glog.Errorf("shutdown prod error: %s\n", err.Error())
 			return err
 		}
 	} else {
-		return errors.New("producer not new,please call function Connect()")
+		return errors.New("prod not new,please call function Connect()")
 	}
 	return nil
 }

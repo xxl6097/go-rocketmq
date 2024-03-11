@@ -3,26 +3,59 @@ package mq
 import (
 	"context"
 	"fmt"
+	"github.com/apache/rocketmq-client-go/v2/consumer"
 	"github.com/apache/rocketmq-client-go/v2/primitive"
+	"github.com/apache/rocketmq-client-go/v2/producer"
 	"github.com/xxl6097/go-glog/glog"
-	"github.com/xxl6097/go-rocketmq/mq/consumer"
-	"github.com/xxl6097/go-rocketmq/mq/producer"
+	"github.com/xxl6097/go-rocketmq/mq/cons"
+	"github.com/xxl6097/go-rocketmq/mq/prod"
 	"time"
 )
 
 type RocketMQ struct {
-	producer   *producer.Producer
-	consumer   *consumer.Consumer
+	producer   *prod.Producer
+	consumer   *cons.Consumer
 	isWaitChan chan bool
 }
 
 func NewMQ() *RocketMQ {
 	c := &RocketMQ{
-		consumer:   consumer.New(),
-		producer:   producer.New(),
+		consumer:   cons.New(),
+		producer:   prod.New(),
 		isWaitChan: make(chan bool),
 	}
 	return c
+}
+
+func (this *RocketMQ) NewRocketMQ(cons_opts []consumer.Option, prod_opts []producer.Option) {
+	err := this.consumer.NewCustomConsumer(cons_opts...)
+	if err != nil {
+		glog.Error("NewConsumer failed ", err.Error())
+		for {
+			time.Sleep(time.Second * 5)
+			err = this.consumer.NewCustomConsumer(cons_opts...)
+			if err == nil {
+				break
+			} else {
+				glog.Error("NewConsumer failed delay 5s retry ", err.Error())
+			}
+		}
+	}
+
+	err = this.producer.NewCustomConsumer(prod_opts...)
+	if err != nil {
+		glog.Error("NewProducer failed ", err.Error())
+		for {
+			time.Sleep(time.Second * 5)
+			err = this.producer.NewCustomConsumer(prod_opts...)
+			if err == nil {
+				break
+			} else {
+				fmt.Println("NewProducer failed delay 5s retry ", err.Error())
+			}
+		}
+	}
+
 }
 
 func (this *RocketMQ) InitRocketMQ(servers []string, groupName string) {
@@ -61,37 +94,37 @@ func (this *RocketMQ) Start() {
 	if err != nil {
 		for {
 			time.Sleep(time.Second * 5)
-			glog.Error("producer start failed")
+			glog.Error("prod start failed")
 			err = this.consumer.Start()
 			if err == nil {
 				break
 			} else {
-				glog.Error("producer start failed delay 5s retry ", err.Error())
+				glog.Error("prod start failed delay 5s retry ", err.Error())
 			}
 		}
 	}
-	glog.Info("consumer start sucess")
+	glog.Info("cons start sucess")
 	err = this.producer.Start()
 	if err != nil {
 		for {
 			time.Sleep(time.Second * 5)
-			glog.Error("consumer start failed")
+			glog.Error("cons start failed")
 			err = this.producer.Start()
 			if err == nil {
 				break
 			} else {
-				glog.Error("consumer start failed delay 5s retry ", err.Error())
+				glog.Error("cons start failed delay 5s retry ", err.Error())
 			}
 		}
 	}
-	glog.Info("producer start sucess")
+	glog.Info("prod start sucess")
 }
 
 func (this *RocketMQ) Init() {
 	glog.Info("RocketMQ init")
 }
 
-func (this *RocketMQ) Subscribe(topic string, _receiver consumer.OnReceiver) {
+func (this *RocketMQ) Subscribe(topic string, _receiver cons.OnReceiver) {
 	err := this.consumer.Subscribe(topic, _receiver)
 	if err != nil {
 		for {

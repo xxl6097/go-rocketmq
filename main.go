@@ -1,7 +1,9 @@
 package main
 
 import (
+	"github.com/apache/rocketmq-client-go/v2/consumer"
 	"github.com/apache/rocketmq-client-go/v2/primitive"
+	"github.com/apache/rocketmq-client-go/v2/producer"
 	"github.com/xxl6097/go-glog/glog"
 	"github.com/xxl6097/go-rocketmq/mq"
 	_ "github.com/xxl6097/go-rocketmq/mq/log"
@@ -22,6 +24,7 @@ func main() {
 	//log.LogDebug = true
 	os.Setenv("ROCKETMQ_GO_LOG_LEVEL", "error")
 	rokmq := mq.NewMQ()
+	rokmq.NewRocketMQ([]consumer.Option{consumer.WithConsumerModel(consumer.BroadCasting)}, []producer.Option{})
 	rokmq.InitRocketMQ(nameserver, groupname)
 	//Subscribe必须再Start之前
 	rokmq.Subscribe(topicSubs, func(msg *primitive.MessageExt) {
