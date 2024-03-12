@@ -16,6 +16,8 @@ type RocketMQ struct {
 	producer   *prod.Producer
 	consumer   *cons.Consumer
 	isWaitChan chan bool
+	consopts   []consumer.Option
+	prodopts   []producer.Option
 }
 
 func NewMQ() *RocketMQ {
@@ -27,13 +29,26 @@ func NewMQ() *RocketMQ {
 	return c
 }
 
-func (this *RocketMQ) NewRocketMQ(cons_opts []consumer.Option, prod_opts []producer.Option) {
-	err := this.consumer.NewCustomConsumer(cons_opts...)
-	if err != nil {
-		glog.Error("NewConsumer failed ", err.Error())
+func (this *RocketMQ) NewRocketMQ(cons_opts []consumer.Option, prod_opts []producer.Option) (error, error) {
+	this.consopts = cons_opts
+	this.prodopts = prod_opts
+	err0 := this.consumer.NewCustomConsumer(cons_opts...)
+	if err0 != nil {
+		glog.Error("NewConsumer failed ", err0.Error())
+	}
+
+	err1 := this.producer.NewCustomConsumer(prod_opts...)
+	if err1 != nil {
+		glog.Error("NewProducer failed ", err1.Error())
+	}
+	return err0, err1
+}
+
+func (this *RocketMQ) ReConn(err0, err1 error) {
+	if err0 != nil {
 		for {
 			time.Sleep(time.Second * 5)
-			err = this.consumer.NewCustomConsumer(cons_opts...)
+			err := this.consumer.NewCustomConsumer(this.consopts...)
 			if err == nil {
 				break
 			} else {
@@ -41,13 +56,10 @@ func (this *RocketMQ) NewRocketMQ(cons_opts []consumer.Option, prod_opts []produ
 			}
 		}
 	}
-
-	err = this.producer.NewCustomConsumer(prod_opts...)
-	if err != nil {
-		glog.Error("NewProducer failed ", err.Error())
+	if err1 != nil {
 		for {
 			time.Sleep(time.Second * 5)
-			err = this.producer.NewCustomConsumer(prod_opts...)
+			err := this.producer.NewCustomConsumer(this.prodopts...)
 			if err == nil {
 				break
 			} else {
