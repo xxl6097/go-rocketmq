@@ -20,54 +20,40 @@ type RocketMQ struct {
 	prodopts   []producer.Option
 }
 
-func NewMQ() *RocketMQ {
-	c := &RocketMQ{
+func NewRocketMQ(cons_opts []consumer.Option, prod_opts []producer.Option, reply bool) *RocketMQ {
+	this := &RocketMQ{
 		consumer:   cons.New(),
 		producer:   prod.New(),
 		isWaitChan: make(chan bool),
 	}
-	return c
-}
-
-func (this *RocketMQ) NewRocketMQ(cons_opts []consumer.Option, prod_opts []producer.Option) (error, error) {
-	this.consopts = cons_opts
-	this.prodopts = prod_opts
-	err0 := this.consumer.NewCustomConsumer(cons_opts...)
-	if err0 != nil {
-		glog.Error("NewConsumer failed ", err0.Error())
-	}
-
-	err1 := this.producer.NewCustomConsumer(prod_opts...)
-	if err1 != nil {
-		glog.Error("NewProducer failed ", err1.Error())
-	}
-	return err0, err1
-}
-
-func (this *RocketMQ) ReConn(err0, err1 error) {
-	if err0 != nil {
-		for {
-			time.Sleep(time.Second * 5)
-			err := this.consumer.NewCustomConsumer(this.consopts...)
-			if err == nil {
-				break
+	for {
+		err := this.consumer.NewCustomConsumer(cons_opts...)
+		if err == nil {
+			break
+		} else {
+			glog.Error("NewConsumer failed delay 5s retry ", err.Error())
+			if !reply {
+				return nil
 			} else {
-				glog.Error("NewConsumer failed delay 5s retry ", err.Error())
+				time.Sleep(time.Second * 5)
+			}
+		}
+
+	}
+	for {
+		err := this.producer.NewCustomConsumer(prod_opts...)
+		if err == nil {
+			break
+		} else {
+			fmt.Println("NewProducer failed delay 5s retry ", err.Error())
+			if !reply {
+				return nil
+			} else {
+				time.Sleep(time.Second * 5)
 			}
 		}
 	}
-	if err1 != nil {
-		for {
-			time.Sleep(time.Second * 5)
-			err := this.producer.NewCustomConsumer(this.prodopts...)
-			if err == nil {
-				break
-			} else {
-				fmt.Println("NewProducer failed delay 5s retry ", err.Error())
-			}
-		}
-	}
-
+	return this
 }
 
 func (this *RocketMQ) InitRocketMQ(servers []string, groupName string) {

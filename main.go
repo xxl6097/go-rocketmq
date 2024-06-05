@@ -23,9 +23,8 @@ func main() {
 	// new simpleConsumer inst
 	//log.LogDebug = true
 	os.Setenv("ROCKETMQ_GO_LOG_LEVEL", "error")
-	rokmq := mq.NewMQ()
-	rokmq.NewRocketMQ([]consumer.Option{consumer.WithConsumerModel(consumer.BroadCasting)}, []producer.Option{})
-	rokmq.InitRocketMQ(nameserver, groupname)
+	rokmq := mq.NewRocketMQ([]consumer.Option{consumer.WithConsumerModel(consumer.BroadCasting)}, []producer.Option{}, true)
+	//rokmq.InitRocketMQ(nameserver, groupname)
 	//Subscribe必须再Start之前
 	rokmq.Subscribe(topicSubs, func(msg *primitive.MessageExt) {
 		glog.Info("-->recv:", string(msg.Body))
