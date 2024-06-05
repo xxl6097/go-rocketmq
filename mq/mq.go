@@ -56,36 +56,36 @@ func NewRocketMQ(cons_opts []consumer.Option, prod_opts []producer.Option, reply
 	return this
 }
 
-func (this *RocketMQ) InitRocketMQ(servers []string, groupName string) {
-	err := this.consumer.NewConsumer(servers, groupName)
-	if err != nil {
-		//fmt.Println("NewConsumer failed ", err.Error())
-		glog.Error("NewConsumer failed ", err.Error())
-		for {
-			time.Sleep(time.Second * 5)
-			err = this.consumer.NewConsumer(servers, groupName)
-			if err == nil {
-				break
-			} else {
-				//fmt.Println("NewConsumer failed delay 5s retry ", err.Error())
-				glog.Error("NewConsumer failed delay 5s retry ", err.Error())
-			}
-		}
-	}
-	err = this.producer.NewProducer(servers)
-	if err != nil {
-		glog.Error("NewProducer failed ", err.Error())
-		for {
-			time.Sleep(time.Second * 5)
-			err = this.producer.NewProducer(servers)
-			if err == nil {
-				break
-			} else {
-				fmt.Println("NewProducer failed delay 5s retry ", err.Error())
-			}
-		}
-	}
-}
+//func (this *RocketMQ) InitRocketMQ(servers []string, groupName string) {
+//	err := this.consumer.NewConsumer(servers, groupName)
+//	if err != nil {
+//		//fmt.Println("NewConsumer failed ", err.Error())
+//		glog.Error("NewConsumer failed ", err.Error())
+//		for {
+//			time.Sleep(time.Second * 5)
+//			err = this.consumer.NewConsumer(servers, groupName)
+//			if err == nil {
+//				break
+//			} else {
+//				//fmt.Println("NewConsumer failed delay 5s retry ", err.Error())
+//				glog.Error("NewConsumer failed delay 5s retry ", err.Error())
+//			}
+//		}
+//	}
+//	err = this.producer.NewProducer(servers)
+//	if err != nil {
+//		glog.Error("NewProducer failed ", err.Error())
+//		for {
+//			time.Sleep(time.Second * 5)
+//			err = this.producer.NewProducer(servers)
+//			if err == nil {
+//				break
+//			} else {
+//				fmt.Println("NewProducer failed delay 5s retry ", err.Error())
+//			}
+//		}
+//	}
+//}
 
 func (this *RocketMQ) Start() {
 	err := this.consumer.Start()
